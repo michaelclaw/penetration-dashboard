@@ -1,0 +1,106 @@
+.findings-alerts {
+  width: 100%;
+}
+
+.findings-summary {
+  margin-bottom: 2rem;
+}
+
+.summary-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.stat-value.high {
+  color: var(--error);
+}
+
+.stat-value.medium {
+  color: var(--warning);
+}
+
+.stat-value.low {
+  color: var(--info);
+}
+
+.findings-list {
+  margin-top: 2rem;
+}
+
+.severity-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.severity-high {
+  background-color: var(--error);
+  color: white;
+}
+
+.severity-medium {
+  background-color: var(--warning);
+  color: white;
+}
+
+.severity-low {
+  background-color: var(--info);
+  color: white;
+}
+
+.status-open {
+  background-color: var(--info);
+  color: white;
+}
+
+.status-confirmed {
+  background-color: var(--success);
+  color: white;
+}
+
+.status-false-positive {
+  background-color: var(--text-secondary);
+  color: white;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  color: var(--text-primary);
+}
+
+.action-btn:hover {
+  background-color: var(--bg-secondary);
+  border-color: var(--accent-primary);
+}

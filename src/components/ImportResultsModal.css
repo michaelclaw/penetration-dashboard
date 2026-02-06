@@ -1,0 +1,169 @@
+.import-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2100;
+  padding: 1.5rem;
+}
+
+.import-window {
+  width: 100%;
+  max-width: 1100px;
+  max-height: 88vh;
+  overflow: hidden;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: 0 12px 30px var(--shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+.import-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.import-header h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+}
+
+.import-close {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.6rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.import-close:hover {
+  color: var(--text-primary);
+}
+
+.import-content {
+  padding: 1rem 1.25rem;
+  overflow: auto;
+}
+
+.import-error {
+  color: white;
+  background: var(--error);
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.import-row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.import-label {
+  color: var(--text-secondary);
+  font-weight: 800;
+}
+
+.import-select {
+  padding: 0.65rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.import-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.import-box {
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  padding: 0.9rem;
+}
+
+.import-box-title {
+  font-weight: 900;
+  color: var(--text-primary);
+  margin-bottom: 0.6rem;
+}
+
+.import-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  resize: vertical;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+.import-help {
+  margin-top: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.import-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.import-btn {
+  padding: 0.65rem 1.1rem;
+  border-radius: 8px;
+  font-weight: 800;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+}
+
+.import-btn.primary {
+  background: var(--accent-primary);
+  color: white;
+  border-color: transparent;
+}
+
+.import-btn.primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.import-btn.secondary {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.import-btn.secondary:hover:not(:disabled) {
+  background: var(--bg-tertiary);
+  border-color: var(--accent-primary);
+}
+
+.import-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (min-width: 1000px) {
+  .import-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+

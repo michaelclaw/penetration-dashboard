@@ -1,0 +1,182 @@
+.controls-config {
+  width: 100%;
+}
+
+.recon-profiles {
+  margin-bottom: 2rem;
+}
+
+.profiles-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.profile-card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.profile-card:hover {
+  border-color: var(--accent-primary);
+  background-color: var(--bg-tertiary);
+}
+
+.profile-card.active {
+  border-color: var(--accent-primary);
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.profile-name {
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.profile-description {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.integrations-status {
+  margin-top: 2rem;
+}
+
+.integrations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.integration-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.integration-loading {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.integration-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: white;
+  background-color: var(--text-secondary);
+}
+
+.integration-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.integration-name {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.integration-status {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.status-ok {
+  color: var(--success);
+}
+
+.status-error {
+  color: var(--error);
+}
+
+.status-missing {
+  color: var(--warning);
+}
+
+.integration-icon.status-ok {
+  background-color: var(--success);
+}
+
+.integration-icon.status-error {
+  background-color: var(--error);
+}
+
+.integration-icon.status-missing {
+  background-color: var(--warning);
+}
+
+.tools-status {
+  margin-top: 2rem;
+}
+
+.tools-hint {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.tools-loading {
+  grid-column: 1 / -1;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.tool-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tool-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.tool-ok {
+  border-color: rgba(40, 167, 69, 0.5);
+  background-color: rgba(40, 167, 69, 0.08);
+}
+
+.tool-missing {
+  border-color: rgba(220, 53, 69, 0.5);
+  background-color: rgba(220, 53, 69, 0.08);
+}
+
+.tool-label {
+  font-weight: 600;
+}
+
+.tool-status-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}

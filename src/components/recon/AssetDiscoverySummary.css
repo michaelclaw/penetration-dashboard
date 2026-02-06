@@ -1,0 +1,88 @@
+.asset-discovery-summary {
+  width: 100%;
+}
+
+.root-domains {
+  margin-bottom: 2rem;
+}
+
+.domain-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.domain-tag {
+  padding: 0.5rem 1rem;
+  background-color: var(--accent-primary);
+  color: white;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.subdomain-summary {
+  margin-bottom: 2rem;
+}
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.summary-card {
+  background-color: var(--bg-secondary);
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.card-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.card-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.card-value.warning {
+  color: var(--warning);
+}
+
+.subdomains-table {
+  margin-bottom: 2rem;
+}
+
+.status-live {
+  background-color: var(--success);
+  color: white;
+}
+
+.status-dead {
+  background-color: var(--text-secondary);
+  color: white;
+}
+
+.ip-asn-summary {
+  margin-top: 2rem;
+}
+
+.summary-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.summary-info strong {
+  color: var(--text-primary);
+}
