@@ -114,6 +114,23 @@ export function initDatabase() {
     )
   `)
 
+  // Scan runs table (scanning tab)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS scan_runs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      scan_id TEXT UNIQUE NOT NULL,
+      target_id INTEGER NOT NULL,
+      tool TEXT NOT NULL,
+      status TEXT DEFAULT 'running',
+      started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      completed_at DATETIME,
+      raw_output TEXT,
+      summary_json TEXT,
+      options_json TEXT,
+      FOREIGN KEY (target_id) REFERENCES targets(id)
+    )
+  `)
+
   // App settings (API keys, config)
   db.exec(`
     CREATE TABLE IF NOT EXISTS app_settings (
@@ -130,6 +147,8 @@ export function initDatabase() {
     CREATE INDEX IF NOT EXISTS idx_services_target ON services(target_id);
     CREATE INDEX IF NOT EXISTS idx_findings_target ON findings(target_id);
     CREATE INDEX IF NOT EXISTS idx_activity_job ON activity_logs(job_id);
+    CREATE INDEX IF NOT EXISTS idx_scan_runs_target ON scan_runs(target_id);
+    CREATE INDEX IF NOT EXISTS idx_scan_runs_tool ON scan_runs(tool);
   `)
 
   console.log('Database initialized successfully')

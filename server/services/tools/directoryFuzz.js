@@ -31,7 +31,7 @@ export async function executeDirectoryFuzz(hosts, logger) {
       
       const tryGobuster = async (targetUrl) => {
         const { stdout } = await runCommand({
-          cmd: `gobuster dir -u ${targetUrl} -w /usr/share/wordlists/dirb/common.txt -q -t 1 --timeout 5s | head -${WORDLIST_SIZE}`,
+          cmd: `gobuster dir -u ${targetUrl} -w /usr/share/wordlists/dirb/common.txt -q -t 1 --timeout 5s --exclude-status 301 --exclude-length 0 | head -${WORDLIST_SIZE}`,
           timeout: 60000,
           logger
         })

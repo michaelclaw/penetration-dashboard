@@ -73,5 +73,7 @@ export const TOOL_ALIASES = {
   findomain: ['findomain'],
   nmap: ['nmap'],
   gobuster: ['gobuster'],
-  dig: ['dig']
+  dig: ['dig'],
+  nuclei: ['nuclei'],
+  nikto: ['nikto']
 }

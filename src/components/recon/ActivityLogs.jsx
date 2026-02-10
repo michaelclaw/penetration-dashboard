@@ -66,14 +66,10 @@ function ActivityLogs() {
 
   const handleDiagnostics = async () => {
     try {
-      const [tools, integrations] = await Promise.all([
-        api.getToolStatus(),
-        api.getIntegrationsStatus()
-      ])
+      const tools = await api.getToolStatus()
       const missingTools = (tools.tools || []).filter(tool => !tool.installed).length
-      const integrationsOk = (integrations.integrations || []).filter(item => item.status === 'ok').length
       showNotification(
-        `Diagnostics: ${missingTools} tools missing, ${integrationsOk} integrations OK`,
+        `Diagnostics: ${missingTools} tools missing`,
         missingTools === 0 ? 'success' : 'warning'
       )
     } catch (error) {

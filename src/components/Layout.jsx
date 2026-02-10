@@ -6,11 +6,13 @@ import './Layout.css'
 
 function Layout({ children }) {
   const { user, logout, isOpenIdEnabled } = useAuth()
-  const { theme, toggleTheme } = useTheme()
+  const { theme, toggleTheme, cycleTheme, themes } = useTheme()
   const location = useLocation()
   const navigate = useNavigate()
 
   const isAdminPage = location.pathname === '/admin'
+  const isScanningPage = location.pathname === '/scanning'
+  const isReconPage = location.pathname === '/'
 
   return (
     <div className="layout">
@@ -19,12 +21,17 @@ function Layout({ children }) {
           <h1 className="logo">Penetration Testing</h1>
           <nav className="nav-tabs">
             <button 
-              className={`nav-tab ${!isAdminPage ? 'active' : ''}`}
+              className={`nav-tab ${isReconPage ? 'active' : ''}`}
               onClick={() => navigate('/')}
             >
               Reconnaissance
             </button>
-            <button className="nav-tab" disabled>Scanning</button>
+            <button
+              className={`nav-tab ${isScanningPage ? 'active' : ''}`}
+              onClick={() => navigate('/scanning')}
+            >
+              Scanning
+            </button>
             <button className="nav-tab" disabled>Exploitation</button>
             <button className="nav-tab" disabled>Post-Exploitation</button>
             <button className="nav-tab" disabled>Reporting</button>
@@ -43,6 +50,13 @@ function Layout({ children }) {
             title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
           >
             {theme === 'light' ? '🌙' : '☀️'}
+          </button>
+          <button
+            className="theme-toggle"
+            onClick={cycleTheme}
+            title={`Theme: ${theme} (${themes.indexOf(theme) + 1}/${themes.length})`}
+          >
+            🎛️
           </button>
           {isOpenIdEnabled && (
             <>

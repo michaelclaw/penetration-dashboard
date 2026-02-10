@@ -28,10 +28,8 @@ function ScanningWindow({ isOpen, onClose, currentStage, progress, stages }) {
     'Subdomains',
     'DNS records',
     'Live hosts',
-    'Ports/services',
     'HTTP probing',
     'Directories',
-    'OSINT',
     'Vulnerability hints'
   ]
 

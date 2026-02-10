@@ -18,9 +18,9 @@ function TargetScopePanel() {
   const [whitepagesCity, setWhitepagesCity] = useState('')
   const [whitepagesState, setWhitepagesState] = useState('')
   const [whitepagesZip, setWhitepagesZip] = useState('')
-  const [hibpDomain, setHibpDomain] = useState('')
-  const [hibpResults, setHibpResults] = useState([])
-  const [hibpLoading, setHibpLoading] = useState(false)
+  const [osintCompany, setOsintCompany] = useState('')
+  const [osintPickerOpen, setOsintPickerOpen] = useState(false)
+  const [osintPendingCompany, setOsintPendingCompany] = useState('')
 
   const loadTargets = useCallback(async () => {
     try {
@@ -119,12 +119,15 @@ function TargetScopePanel() {
       return
     }
 
-    const locationParts = [city, state, zip].filter(Boolean).join(' ')
-    const query = new URLSearchParams({
-      name: name,
-      where: locationParts
-    })
-    const url = `https://www.whitepages.com/name?${query.toString()}`
+    const slugName = name.trim().split(/\s+/).map(part => {
+      return part.charAt(0).toUpperCase() + part.slice(1)
+    }).join('-')
+    const slugLocation = [city, state, zip]
+      .filter(Boolean)
+      .map(part => part.trim())
+      .join('-')
+    const searchedLocation = [city, state, zip].filter(Boolean).join(', ').replace(', ,', ',')
+    const url = `https://www.whitepages.com/name/${encodeURIComponent(slugName)}/${encodeURIComponent(slugLocation)}?fs=1&searchedName=${encodeURIComponent(name)}&searchedLocation=${encodeURIComponent(searchedLocation)}`
 
     window.open(url, '_blank', 'noopener,noreferrer')
     setWhitepagesName('')
@@ -133,23 +136,37 @@ function TargetScopePanel() {
     setWhitepagesZip('')
   }
 
-  const handleHibpLookup = async (e) => {
+
+  const openOpenCorporates = (company) => {
+    const url = `https://opencorporates.com/companies?q=${encodeURIComponent(company)}`
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }
+
+  const openWayback = (company) => {
+    const url = `https://web.archive.org/web/*/${encodeURIComponent(company)}`
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }
+
+  const handleOsintSubmit = (e) => {
     e.preventDefault()
-    const domain = hibpDomain.trim()
-    if (!domain) {
-      showNotification('Please enter a domain or company domain for HIBP lookup', 'warning')
+    const company = osintCompany.trim()
+    if (!company) {
+      showNotification('Please enter a company name for OSINT lookup', 'warning')
       return
     }
-    setHibpLoading(true)
-    try {
-      const data = await api.getHibpBreaches(domain)
-      setHibpResults(data.breaches || [])
-      showNotification('HIBP lookup complete', 'success')
-    } catch (error) {
-      showNotification(error.message || 'HIBP lookup failed', 'error')
-    } finally {
-      setHibpLoading(false)
+    setOsintPendingCompany(company)
+    setOsintPickerOpen(true)
+  }
+
+  const handleOsintPick = (action) => {
+    if (!osintPendingCompany) return
+    if (action === 'opencorporates') {
+      openOpenCorporates(osintPendingCompany)
     }
+    if (action === 'wayback') {
+      openWayback(osintPendingCompany)
+    }
+    setOsintPickerOpen(false)
   }
 
   return (
@@ -305,41 +322,49 @@ function TargetScopePanel() {
         </form>
       </div>
 
-      <div className="hibp-lookup">
-        <h4 className="subsection-title">Have I Been Pwned (domain lookup):</h4>
-        <form className="hibp-form" onSubmit={handleHibpLookup}>
+      <div className="osint-quick-links">
+        <h4 className="subsection-title">Company OSINT quick links:</h4>
+        <form className="osint-form" onSubmit={handleOsintSubmit}>
           <div className="form-group">
-            <label>Domain or company domain:</label>
+            <label>Company name:</label>
             <input
               type="text"
-              value={hibpDomain}
-              onChange={(e) => setHibpDomain(e.target.value)}
-              placeholder="example.com"
+              value={osintCompany}
+              onChange={(e) => setOsintCompany(e.target.value)}
+              placeholder="Google"
               className="form-input"
             />
             <p className="form-help">
-              HIBP supports domain checks (use the company’s primary domain).
+              This input will power additional OSINT links as they are added.
             </p>
           </div>
-          <button type="submit" className="btn-primary" disabled={hibpLoading}>
-            {hibpLoading ? 'Checking...' : 'Check HIBP'}
+          <button type="submit" className="btn-primary">
+            Choose OSINT Source
           </button>
         </form>
-        <div className="hibp-results">
-          {hibpResults.length === 0 ? (
-            <div className="hibp-empty">No breaches found (or none returned).</div>
-          ) : (
-            <ul className="hibp-list">
-              {hibpResults.map(breach => (
-                <li key={breach.Name || breach.Title}>
-                  <strong>{breach.Title || breach.Name}</strong>
-                  {breach.BreachDate ? ` — ${breach.BreachDate}` : ''}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
       </div>
+
+      {osintPickerOpen && (
+        <div className="osint-picker-backdrop" role="dialog" aria-modal="true">
+          <div className="osint-picker">
+            <h5 className="osint-picker-title">Open OSINT source</h5>
+            <p className="osint-picker-note">
+              Select a source for: <strong>{osintPendingCompany}</strong>
+            </p>
+            <div className="osint-picker-actions">
+              <button type="button" className="btn-primary" onClick={() => handleOsintPick('opencorporates')}>
+                Open OpenCorporates
+              </button>
+              <button type="button" className="btn-primary" onClick={() => handleOsintPick('wayback')}>
+                Open Wayback Machine
+              </button>
+            </div>
+            <button type="button" className="btn-secondary" onClick={() => setOsintPickerOpen(false)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       <IcannLookupModal
         isOpen={showIcann}

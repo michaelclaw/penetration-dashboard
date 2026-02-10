@@ -11,8 +11,8 @@ function ReconDashboard() {
   return (
     <div className="recon-dashboard">
       <div className="dashboard-header">
-        <h2>Main Recon Dashboard</h2>
-        <p className="dashboard-subtitle">Web Recon Tool</p>
+        <h2>Reconnaissance Management Panel</h2>
+        <p className="dashboard-subtitle">Target intake, scanning, and OSINT workflows</p>
       </div>
 
       <div className="dashboard-grid">

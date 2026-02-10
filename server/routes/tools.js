@@ -1,9 +1,8 @@
 import express from 'express'
-import { promisify } from 'util'
-import { exec } from 'child_process'
+import { db } from '../database.js'
+import { broadcast } from '../server.js'
+import { runCommand } from '../services/tools/commandRunner.js'
 import { findTool, TOOL_ALIASES } from '../services/tools/toolDetection.js'
-
-const execAsync = promisify(exec)
 
 export const toolsRouter = express.Router()
 
@@ -41,6 +40,18 @@ const TOOL_DEFINITIONS = [
     label: 'nmap',
     commands: TOOL_ALIASES.nmap,
     packages: ['nmap']
+  },
+  {
+    id: 'nuclei',
+    label: 'nuclei',
+    commands: TOOL_ALIASES.nuclei,
+    packages: ['nuclei']
+  },
+  {
+    id: 'nikto',
+    label: 'nikto',
+    commands: TOOL_ALIASES.nikto,
+    packages: ['nikto']
   },
   {
     id: 'gobuster',
@@ -85,17 +96,34 @@ async function getToolStatus() {
   return tools
 }
 
-async function runInstallSteps(steps) {
+function logActivity(jobId, message, level = 'info') {
+  db.prepare(`
+    INSERT INTO activity_logs (job_id, message, level)
+    VALUES (?, ?, ?)
+  `).run(jobId, message, level)
+
+  broadcast({
+    type: 'activity',
+    jobId,
+    message,
+    level,
+    timestamp: new Date().toISOString()
+  })
+}
+
+async function runInstallSteps(steps, logger) {
   for (const step of steps) {
-    await execAsync(step, { timeout: 120000 })
+    await runCommand({ cmd: step, timeout: 120000, logger })
   }
 }
 
-async function installPackages(packages) {
+async function installPackages(packages, logger) {
   const pkgList = packages.join(' ')
-  await execAsync('apt-get update', { timeout: 300000 })
-  await execAsync(`DEBIAN_FRONTEND=noninteractive apt-get install -y ${pkgList}`, {
-    timeout: 300000
+  await runCommand({ cmd: 'apt-get update', timeout: 300000, logger })
+  await runCommand({
+    cmd: `DEBIAN_FRONTEND=noninteractive apt-get install -y ${pkgList}`,
+    timeout: 300000,
+    logger
   })
 }
 
@@ -130,10 +158,14 @@ toolsRouter.post('/install', async (req, res) => {
       return res.status(404).json({ error: 'Unknown tool' })
     }
 
+    const jobId = `tool-install:${toolId}`
+    const logger = (message, level = 'info') => logActivity(jobId, message, level)
+    logger(`Tool install requested: ${tool.label}`, 'info')
+
     if (tool.installSteps) {
-      await runInstallSteps(tool.installSteps)
+      await runInstallSteps(tool.installSteps, logger)
     } else if (tool.packages) {
-      await installPackages(tool.packages)
+      await installPackages(tool.packages, logger)
     } else {
       return res.status(400).json({ error: 'Tool is not installable via backend' })
     }

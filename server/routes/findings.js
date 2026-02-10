@@ -6,7 +6,9 @@ export const findingsRouter = express.Router()
 // Get all findings
 findingsRouter.get('/', (req, res) => {
   try {
-    const { targetId, severity, status } = req.query
+    const { targetId, severity, status, type, jobId } = req.query
+    const limit = Math.min(parseInt(req.query.limit || '200', 10), 2000)
+    const offset = Math.max(parseInt(req.query.offset || '0', 10), 0)
     let sql = 'SELECT * FROM findings WHERE 1=1'
     const params = []
 
@@ -14,16 +16,25 @@ findingsRouter.get('/', (req, res) => {
       sql += ' AND target_id = ?'
       params.push(targetId)
     }
+    if (jobId) {
+      sql += ' AND job_id = ?'
+      params.push(jobId)
+    }
     if (severity) {
       sql += ' AND severity = ?'
       params.push(severity)
+    }
+    if (type) {
+      sql += ' AND type = ?'
+      params.push(type)
     }
     if (status) {
       sql += ' AND status = ?'
       params.push(status)
     }
 
-    sql += ' ORDER BY first_seen DESC'
+    sql += ' ORDER BY first_seen DESC LIMIT ? OFFSET ?'
+    params.push(limit, offset)
     const findings = db.prepare(sql).all(...params)
     res.json(findings)
   } catch (error) {

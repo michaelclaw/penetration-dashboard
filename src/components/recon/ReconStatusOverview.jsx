@@ -68,10 +68,8 @@ function ReconStatusOverview() {
     { name: 'Subdomains', count: 0, status: 'QUEUED' },
     { name: 'DNS records', count: 0, status: 'QUEUED' },
     { name: 'Live hosts', count: 0, status: 'QUEUED' },
-    { name: 'Ports/services', count: 0, status: 'QUEUED' },
     { name: 'HTTP probing', count: 0, status: 'QUEUED' },
     { name: 'Directories', count: 0, status: 'QUEUED' },
-    { name: 'OSINT', count: 0, status: 'QUEUED' },
     { name: 'Vulnerability hints', count: 0, status: 'QUEUED' }
   ])
 
@@ -95,7 +93,8 @@ function ReconStatusOverview() {
         setCurrentProfile(parsed.currentProfile)
       }
       if (Array.isArray(parsed.pipelineStages)) {
-        setPipelineStages(parsed.pipelineStages)
+        const filtered = parsed.pipelineStages.filter(stage => stage.name !== 'Ports/services')
+        setPipelineStages(filtered)
       }
     } catch {
       // ignore bad state
@@ -299,7 +298,7 @@ function ReconStatusOverview() {
   useEffect(() => {
     const checkHealth = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/health`)
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:3001/api'}/health`)
         if (response.ok) {
           setApiHealth(true)
         } else {
@@ -343,8 +342,7 @@ function ReconStatusOverview() {
 
     const unsupported = [
       'HTTP probing',
-      'Directories',
-      'OSINT'
+      'Directories'
     ]
 
     if (unsupported.includes(stageName)) {
@@ -380,25 +378,6 @@ function ReconStatusOverview() {
         setDetailItems(filtered)
         if (filtered.length === 0) {
           setDetailMessage('No results found for this stage yet.')
-        }
-      } else if (stageName === 'Ports/services') {
-        const results = await Promise.all(
-          targets.map(async (target) => {
-            const services = await api.getServices({ targetId: target.id })
-            return services.map(service => ({
-              target: target.target,
-              host: service.host,
-              ip: service.ip,
-              port: service.port,
-              protocol: service.protocol,
-              service: service.service_name || 'unknown'
-            }))
-          })
-        )
-        const flattened = results.flat()
-        setDetailItems(flattened)
-        if (flattened.length === 0) {
-          setDetailMessage('No services found yet.')
         }
       } else if (stageName === 'Vulnerability hints') {
         const results = await Promise.all(
@@ -477,10 +456,8 @@ function ReconStatusOverview() {
         { name: 'Subdomains', count: 0, status: 'QUEUED' },
         { name: 'DNS records', count: 0, status: 'QUEUED' },
         { name: 'Live hosts', count: 0, status: 'QUEUED' },
-        { name: 'Ports/services', count: 0, status: 'QUEUED' },
         { name: 'HTTP probing', count: 0, status: 'QUEUED' },
         { name: 'Directories', count: 0, status: 'QUEUED' },
-        { name: 'OSINT', count: 0, status: 'QUEUED' },
         { name: 'Vulnerability hints', count: 0, status: 'QUEUED' }
       ])
 
@@ -709,15 +686,6 @@ function ReconStatusOverview() {
               <div className="stage-detail-empty">{detailMessage}</div>
             ) : (
               <div className="stage-detail-list">
-                {detailTitle === 'Ports/services' && detailItems.map((item, idx) => (
-                  <div key={idx} className="stage-detail-row">
-                    <span>{item.host}</span>
-                    <span>{item.ip}</span>
-                    <span>{item.port}/{item.protocol}</span>
-                    <span>{item.service}</span>
-                    <span>{item.target}</span>
-                  </div>
-                ))}
                 {detailTitle === 'Subdomains' && detailItems.map((item, idx) => (
                   <div key={idx} className="stage-detail-row">
                     <span>{item.subdomain}</span>

@@ -40,6 +40,74 @@
   --shadow: rgba(0, 0, 0, 0.3);
 }
 
+[data-theme="hacker"] {
+  /* Hacker theme */
+  --bg-primary: #070b0b;
+  --bg-secondary: #0d1713;
+  --bg-tertiary: #13241c;
+  --text-primary: #d1ffe6;
+  --text-secondary: #7ad5a4;
+  --border-color: #1c3a2c;
+  --accent-primary: #00d084;
+  --accent-hover: #18f1a4;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #38bdf8;
+  --card-bg: #0f1a15;
+  --shadow: rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="hacker"] body {
+  background-color: var(--bg-primary);
+  background-image:
+    radial-gradient(60% 40% at 12% 12%, rgba(0, 208, 132, 0.12), transparent 60%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 208, 132, 0.06) 0,
+      rgba(0, 208, 132, 0.06) 1px,
+      transparent 1px,
+      transparent 120px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0, 208, 132, 0.16) 0,
+      rgba(0, 208, 132, 0.16) 2px,
+      transparent 2px,
+      transparent 10px
+    );
+  background-size: 100% 100%, 120px 100%, 100% 200px;
+  background-position: 0 0, 0 0, 0 0;
+  animation: matrix-rain 8s linear infinite;
+}
+
+@keyframes matrix-rain {
+  0% {
+    background-position: 0 0, 0 0, 0 0;
+  }
+  100% {
+    background-position: 0 0, 0 0, 0 240px;
+  }
+}
+
+[data-theme="midnight"] {
+  /* Midnight theme */
+  --bg-primary: #0b1020;
+  --bg-secondary: #141b34;
+  --bg-tertiary: #1e2647;
+  --text-primary: #e2e8ff;
+  --text-secondary: #9aa6d1;
+  --border-color: #2a345c;
+  --accent-primary: #8b5cf6;
+  --accent-hover: #a78bfa;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #60a5fa;
+  --card-bg: #141b34;
+  --shadow: rgba(0, 0, 0, 0.35);
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',

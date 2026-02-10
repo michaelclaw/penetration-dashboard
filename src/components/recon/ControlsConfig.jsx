@@ -15,8 +15,6 @@ function ControlsConfig() {
   const [toolStatus, setToolStatus] = useState([])
   const [toolsLoading, setToolsLoading] = useState(true)
   const [installing, setInstalling] = useState({})
-  const [integrations, setIntegrations] = useState([])
-  const [integrationsLoading, setIntegrationsLoading] = useState(true)
   const [selectedProfile, setSelectedProfile] = useState(() => {
     return localStorage.getItem(profileStorageKey) || 'Standard external'
   })
@@ -32,8 +30,8 @@ function ControlsConfig() {
   }, [profileStorageKey])
 
   const profiles = [
-    { name: 'Standard external', description: 'subdomains + DNS + HTTP + basic OSINT' },
-    { name: 'OSINT-heavy', description: 'social, leaks, code search; minimal active' },
+    { name: 'Standard external', description: 'subdomains + DNS + HTTP + basic OSINT links' },
+    { name: 'OSINT-heavy', description: 'manual OSINT links; minimal active probing' },
     { name: 'Stealth', description: 'low-rate DNS/HTTP, no port sweeps' },
     { name: 'Custom profile...', description: 'edit modules, rate limits, wordlists' }
   ]
@@ -51,21 +49,8 @@ function ControlsConfig() {
     }
   }
 
-  const fetchIntegrationsStatus = async () => {
-    setIntegrationsLoading(true)
-    try {
-      const data = await api.getIntegrationsStatus()
-      setIntegrations(data.integrations || [])
-    } catch (error) {
-      showNotification(error.message || 'Failed to load integrations status', 'error')
-    } finally {
-      setIntegrationsLoading(false)
-    }
-  }
-
   useEffect(() => {
     fetchToolStatus()
-    fetchIntegrationsStatus()
   }, [])
 
   useEffect(() => {
@@ -112,30 +97,6 @@ function ControlsConfig() {
                 <strong>{profile.name}</strong>
               </div>
               <div className="profile-description">{profile.description}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="integrations-status">
-        <h4 className="subsection-title">Integrations status:</h4>
-        <div className="integrations-grid">
-          {integrationsLoading && (
-            <div className="integration-card integration-loading">
-              Checking integrations...
-            </div>
-          )}
-          {!integrationsLoading && integrations.map((integration, idx) => (
-            <div key={idx} className="integration-card">
-              <div className={`integration-icon status-${integration.status}`}>
-                {integration.name?.[0] || '?'}
-              </div>
-              <div className="integration-meta">
-                <span className="integration-name">{integration.name}</span>
-                <span className={`integration-status status-${integration.status}`}>
-                  {integration.status === 'ok' ? 'OK' : integration.status === 'missing' ? 'Missing' : 'Error'}
-                </span>
-              </div>
             </div>
           ))}
         </div>

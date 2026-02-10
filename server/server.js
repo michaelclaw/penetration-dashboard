@@ -11,10 +11,8 @@ import { servicesRouter } from './routes/services.js'
 import { icannRouter } from './routes/icann.js'
 import { importRouter } from './routes/import.js'
 import { toolsRouter } from './routes/tools.js'
-import { integrationsRouter } from './routes/integrations.js'
+import { scansRouter } from './routes/scans.js'
 import { activityRouter } from './routes/activity.js'
-import { settingsRouter } from './routes/settings.js'
-import { hibpRouter } from './routes/hibp.js'
 import { dnsRecordsRouter } from './routes/dnsRecords.js'
 import { setBroadcastFunction } from './services/reconService.js'
 
@@ -22,8 +20,14 @@ const app = express()
 const server = http.createServer(app)
 const wss = new WebSocketServer({ server })
 
+app.set('etag', false)
 app.use(cors())
 app.use(express.json())
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store')
+  res.set('Pragma', 'no-cache')
+  next()
+})
 
 // Initialize database
 initDatabase()
@@ -73,10 +77,8 @@ app.use('/api/services', servicesRouter)
 app.use('/api/icann', icannRouter)
 app.use('/api/import', importRouter)
 app.use('/api/tools', toolsRouter)
-app.use('/api/integrations', integrationsRouter)
+app.use('/api/scans', scansRouter)
 app.use('/api/activity', activityRouter)
-app.use('/api/settings', settingsRouter)
-app.use('/api/hibp', hibpRouter)
 app.use('/api/dns-records', dnsRecordsRouter)
 
 // Health check

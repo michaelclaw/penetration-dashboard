@@ -1,10 +1,13 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:3001/api'
 
 async function request(endpoint, options = {}) {
   const url = `${API_URL}${endpoint}`
   const config = {
+    cache: 'no-store',
     headers: {
       'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache',
+      Pragma: 'no-cache',
       ...options.headers
     },
     ...options
@@ -78,8 +81,17 @@ export const api = {
   getToolStatus: () => request('/tools/status'),
   installTool: (toolId) => request('/tools/install', { method: 'POST', body: { toolId } }),
 
-  // Integrations
-  getIntegrationsStatus: () => request('/integrations/status'),
+  // Scans
+  getScans: (params = {}) => {
+    const query = new URLSearchParams(params).toString()
+    return request(`/scans?${query}`)
+  },
+  getScan: (scanId, params = {}) => {
+    const query = new URLSearchParams(params).toString()
+    return request(`/scans/${scanId}${query ? `?${query}` : ''}`)
+  },
+  startScan: (targetId, tool, options = {}) =>
+    request('/scans/start', { method: 'POST', body: { targetId, tool, options } }),
 
   // Activity logs
   getActivityLogs: (params = {}) => {
@@ -97,12 +109,6 @@ export const api = {
   },
 
   // Settings (API keys)
-  getApiKeys: () => request('/settings/api-keys'),
-  updateApiKeys: (keys) => request('/settings/api-keys', { method: 'POST', body: { keys } }),
-
-  // HIBP
-  getHibpBreaches: (domain) => request(`/hibp/breaches?domain=${encodeURIComponent(domain)}`),
-
   // DNS records
   getDnsRecords: (params) => {
     const query = new URLSearchParams(params).toString()

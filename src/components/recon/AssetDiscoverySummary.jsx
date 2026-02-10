@@ -6,14 +6,25 @@ function AssetDiscoverySummary() {
   const [rootDomains, setRootDomains] = useState([])
   const [subdomains, setSubdomains] = useState([])
   const [loading, setLoading] = useState(true)
+  const [isVisible, setIsVisible] = useState(true)
 
   useEffect(() => {
     loadData()
-    
-    // Refresh every 10 seconds
-    const interval = setInterval(loadData, 10000)
-    return () => clearInterval(interval)
+
+    const handleVisibility = () => {
+      setIsVisible(document.visibilityState === 'visible')
+    }
+    handleVisibility()
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => document.removeEventListener('visibilitychange', handleVisibility)
   }, [])
+
+  useEffect(() => {
+    if (!isVisible) return
+    // Refresh every 30 seconds
+    const interval = setInterval(loadData, 30000)
+    return () => clearInterval(interval)
+  }, [isVisible])
 
   const loadData = async () => {
     try {

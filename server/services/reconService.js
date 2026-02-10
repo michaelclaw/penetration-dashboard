@@ -13,10 +13,8 @@ function broadcast(data) {
 }
 import { executeSubdomainEnum } from './tools/subdomainEnum.js'
 import { executeDNSEnum } from './tools/dnsEnum.js'
-import { executePortScan } from './tools/portScan.js'
 import { executeHTTPProbe } from './tools/httpProbe.js'
 import { executeDirectoryFuzz } from './tools/directoryFuzz.js'
-import { executeOSINT } from './tools/osint.js'
 import { analyzeFindings } from './tools/vulnAnalysis.js'
 import { resolveSubdomainIPs } from './tools/resolveIPs.js'
 import { findTool, TOOL_ALIASES } from './tools/toolDetection.js'
@@ -60,10 +58,8 @@ export async function startReconJob(targetId, profile = 'Standard external') {
       subdomains: { status: 'queued', count: 0 },
       dns: { status: 'queued', count: 0 },
       liveHosts: { status: 'queued', count: 0 },
-      ports: { status: 'queued', count: 0 },
       http: { status: 'queued', count: 0 },
       directories: { status: 'queued', count: 0 },
-      osint: { status: 'queued', count: 0 },
       vulnHints: { status: 'queued', count: 0 }
     }
   }
@@ -268,62 +264,7 @@ async function executeReconPipeline(job) {
       logActivity(job.id, `Live host detection completed: ${liveHosts.length} hosts`, 'info')
     }
 
-    // Stage 4: Port Scanning
-    if (job.paused || job.status !== 'running') return
-    job.currentStage = 'Ports/services'
-    if (isStealth || isOsintHeavy || isCidr || isOrg) {
-      job.stages.ports.status = 'skipped'
-      job.stages.ports.count = 0
-      broadcast({ type: 'stage_update', jobId: job.id, stage: 'Ports/services', status: 'skipped', count: 0 })
-      const reason = isStealth || isOsintHeavy ? `profile (${job.profile})` : `target type (${job.targetType})`
-      logActivity(job.id, `Port scanning skipped due to ${reason}`, 'warning')
-    } else {
-      job.stages.ports.status = 'running'
-      broadcast({ type: 'stage_update', jobId: job.id, stage: 'Ports/services', status: 'running' })
-    
-      const liveHostsData = db.prepare(`
-        SELECT DISTINCT subdomain, ip FROM subdomains 
-        WHERE target_id = ? AND status = 'LIVE' AND ip IS NOT NULL
-      `).all(job.targetId)
-      
-      if (liveHostsData.length === 0 && isIp) {
-        liveHostsData.push({ subdomain: normalizedTarget, ip: normalizedTarget })
-      }
-      
-      const services = await executePortScan(liveHostsData, logger)
-      if (job.status !== 'running') return
-      
-      job.stages.ports.count = services.length
-      job.stages.ports.status = 'done'
-      
-      // Save services
-      const serviceStmt = db.prepare(`
-        INSERT INTO services (target_id, job_id, host, ip, port, protocol, service_name)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `)
-      services.forEach(service => {
-        serviceStmt.run(
-          job.targetId, 
-          job.id, 
-          service.host, 
-          service.ip, 
-          service.port, 
-          service.protocol, 
-          service.service
-        )
-      })
-      
-      broadcast({ 
-        type: 'stage_update', 
-        jobId: job.id, 
-        stage: 'Ports/services', 
-        status: 'done', 
-        count: services.length 
-      })
-      logActivity(job.id, `Port scanning completed: ${services.length} services found`, 'info')
-    }
-
-    // Stage 5: HTTP Probing
+    // Stage 4: HTTP Probing
     if (job.paused || job.status !== 'running') return
     job.currentStage = 'HTTP probing'
     if (isCidr || isOrg) {
@@ -398,28 +339,7 @@ async function executeReconPipeline(job) {
       logActivity(job.id, `Directory fuzzing completed: ${directories.length} directories found`, 'info')
     }
 
-    // Stage 7: OSINT
-    if (job.paused || job.status !== 'running') return
-    job.currentStage = 'OSINT'
-    job.stages.osint.status = 'running'
-    broadcast({ type: 'stage_update', jobId: job.id, stage: 'OSINT', status: 'running' })
-    
-    const osintResults = await executeOSINT(normalizedTarget, logger)
-    if (job.status !== 'running') return
-    
-    job.stages.osint.count = osintResults.length
-    job.stages.osint.status = 'done'
-    
-    broadcast({ 
-      type: 'stage_update', 
-      jobId: job.id, 
-      stage: 'OSINT', 
-      status: 'done', 
-      count: osintResults.length 
-    })
-    logActivity(job.id, `OSINT collection completed: ${osintResults.length} results`, 'info')
-
-    // Stage 8: Vulnerability Analysis
+    // Stage 7: Vulnerability Analysis
     if (job.paused || job.status !== 'running') return
     job.currentStage = 'Vulnerability hints'
     job.stages.vulnHints.status = 'running'

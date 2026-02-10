@@ -9,23 +9,34 @@ function FindingsAlerts() {
   const [summary, setSummary] = useState({ total: 0, high: 0, medium: 0, low: 0 })
   const [loading, setLoading] = useState(true)
   const [updatingId, setUpdatingId] = useState(null)
+  const [isVisible, setIsVisible] = useState(true)
 
   useEffect(() => {
     loadFindings()
     loadSummary()
     
-    // Refresh every 5 seconds so new findings appear after recon
+    const handleVisibility = () => {
+      setIsVisible(document.visibilityState === 'visible')
+    }
+    handleVisibility()
+    document.addEventListener('visibilitychange', handleVisibility)
+    
+    return () => document.removeEventListener('visibilitychange', handleVisibility)
+  }, [])
+
+  useEffect(() => {
+    if (!isVisible) return
+    // Refresh every 15 seconds so new findings appear after recon
     const interval = setInterval(() => {
       loadFindings()
       loadSummary()
-    }, 5000)
-    
+    }, 15000)
     return () => clearInterval(interval)
-  }, [])
+  }, [isVisible])
 
   const loadFindings = async () => {
     try {
-      const data = await api.getFindings({ status: 'Open' })
+      const data = await api.getFindings({ status: 'Open', limit: 300 })
       setFindings(data)
     } catch (error) {
       console.error('Failed to load findings:', error)

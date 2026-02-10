@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/Layout'
 import ReconDashboard from './pages/ReconDashboard'
+import ScanningDashboard from './pages/ScanningDashboard'
 import AdminPanel from './pages/AdminPanel'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { SettingsProvider } from './contexts/SettingsContext'
@@ -29,6 +30,14 @@ function AppContent() {
           element={
             <Layout>
               <ReconDashboard />
+            </Layout>
+          }
+        />
+        <Route
+          path="/scanning"
+          element={
+            <Layout>
+              <ScanningDashboard />
             </Layout>
           }
         />
