@@ -1,6 +1,6 @@
 # Recon Dashboard
 
-Version: 1.0.36
+Version: 1.0.51
 This version number should be updated whenever code changes are made.
 
 ## What It Does
