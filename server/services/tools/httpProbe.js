@@ -43,18 +43,39 @@ export async function executeHTTPProbe(hosts, logger) {
       const hostname = normalizeHost(rawHost)
       if (!hostname) continue
       
+      const recordHit = (protocol, status) => {
+        liveHosts.push({
+          host: hostname,
+          protocol,
+          status: status ? parseInt(status, 10) : null
+        })
+      }
+
       // Try httpx or httpx-toolkit first
       let httpxFound = false
       if (httpxCommand) {
         try {
           const { stdout } = await runCommand({
-            cmd: `${httpxCommand} -status-code -silent -timeout ${PROBE_TIMEOUT}ms -no-fallback ${hostname}`,
+            cmd: `${httpxCommand} -status-code -no-color -silent -timeout ${PROBE_TIMEOUT}ms -no-fallback ${hostname}`,
             timeout: PROBE_TIMEOUT + 1000,
             logger
           })
           
           if (stdout.trim()) {
-            liveHosts.push(hostname)
+            stdout.split('\n').forEach(line => {
+              const trimmed = line.trim()
+              if (!trimmed) return
+              const match = trimmed.match(/(https?:\/\/\S+)\s+\[(\d{3})\]/)
+              if (match) {
+                const url = match[1]
+                const status = match[2]
+                const protocol = url.startsWith('https://') ? 'https' : 'http'
+                recordHit(protocol, status)
+              } else if (/^https?:\/\//.test(trimmed)) {
+                const protocol = trimmed.startsWith('https://') ? 'https' : 'http'
+                recordHit(protocol, null)
+              }
+            })
             httpxFound = true
           }
         } catch {
@@ -75,7 +96,7 @@ export async function executeHTTPProbe(hosts, logger) {
               })
               
               if (stdout && stdout !== '000' && parseInt(stdout) > 0) {
-                liveHosts.push(hostname)
+                recordHit(protocol, stdout)
                 break
               }
             } catch {

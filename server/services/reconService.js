@@ -291,6 +291,29 @@ async function executeReconPipeline(job) {
       job.stages.http.count = httpServices.length
       job.stages.http.status = 'done'
       
+      if (httpServices.length > 0) {
+        const ipRows = db.prepare('SELECT subdomain, ip FROM subdomains WHERE target_id = ?').all(job.targetId)
+        const ipMap = new Map(ipRows.map(row => [row.subdomain, row.ip]))
+        const insertStmt = db.prepare(`
+          INSERT INTO services (target_id, job_id, host, ip, port, protocol, service_name, http_status)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `)
+        httpServices.forEach(entry => {
+          const protocol = entry.protocol || 'http'
+          const port = protocol === 'https' ? 443 : 80
+          insertStmt.run(
+            job.targetId,
+            job.id,
+            entry.host,
+            ipMap.get(entry.host) || entry.host,
+            port,
+            protocol,
+            protocol,
+            entry.status || null
+          )
+        })
+      }
+      
       broadcast({ 
         type: 'stage_update', 
         jobId: job.id, 

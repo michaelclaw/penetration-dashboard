@@ -341,7 +341,6 @@ function ReconStatusOverview() {
     }
 
     const unsupported = [
-      'HTTP probing',
       'Directories'
     ]
 
@@ -396,6 +395,26 @@ function ReconStatusOverview() {
         setDetailItems(flattened)
         if (flattened.length === 0) {
           setDetailMessage('No findings found yet.')
+        }
+      } else if (stageName === 'HTTP probing') {
+        const results = await Promise.all(
+          targets.map(async (target) => {
+            const services = await api.getServices({ targetId: target.id })
+            return services
+              .filter(service => service.http_status !== null && service.http_status !== undefined)
+              .map(service => ({
+                target: target.target,
+                host: service.host,
+                protocol: service.protocol,
+                status: service.http_status,
+                port: service.port
+              }))
+          })
+        )
+        const flattened = results.flat()
+        setDetailItems(flattened)
+        if (flattened.length === 0) {
+          setDetailMessage('No HTTP probe results found yet.')
         }
       } else if (stageName === 'DNS records') {
         const results = await Promise.all(
@@ -698,6 +717,15 @@ function ReconStatusOverview() {
                   <div key={idx} className="stage-detail-row">
                     <span>{item.subdomain}</span>
                     <span>{item.ip || '-'}</span>
+                    <span>{item.target}</span>
+                  </div>
+                ))}
+                {detailTitle === 'HTTP probing' && detailItems.map((item, idx) => (
+                  <div key={idx} className="stage-detail-row">
+                    <span>{item.host}</span>
+                    <span>{item.protocol || '-'}</span>
+                    <span>{item.status || '-'}</span>
+                    <span>{item.port || '-'}</span>
                     <span>{item.target}</span>
                   </div>
                 ))}
